@@ -6,7 +6,7 @@
     <meta name="viewport"
           content="width=device-width,initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
     <style>
         html, body, #app {
             width: 100%;
@@ -177,567 +177,579 @@
 <script src="js/echarts.js"></script>
 <script src="js/axios.min.js"></script>
 <script type="text/javascript">
-    new Vue({
-        el: '#app',
-        data: {
-            timer1:'',
-            timer2:'',
-            timer3:'',
-            timer4:'',
-            timer5:'',
-            timer6:'',
-            config: {},
-            totalCount: 0,
-            treateCount: 0,
-            untreateCount: 0,
-            top5: {
-                dataX: [],
-                dataY: [],
-            },
-            trouble: [],
-            satisfaction: {
-                dataX: [],
-                dataY: [],
-                legendData: [],
-            },
-            usersat: {
-                dataX: [],
-                dataY1: [],
-                dataY2: [],
-                dataY3: [],
+  new Vue({
+    el: '#app',
+    data: {
+      timer1: '',
+      timer2: '',
+      timer3: '',
+      timer4: '',
+      timer5: '',
+      timer6: '',
+      config: {},
+      totalCount: 0,
+      treateCount: 0,
+      untreateCount: 0,
+      top5: {
+        dataX: [],
+        dataY: [],
+      },
+      trouble: [],
+      satisfaction: {
+        dataX: [],
+        dataY: [],
+        legendData: [],
+      },
+      usersat: {
+        dataX: [],
+        dataY1: [],
+        dataY2: [],
+        dataY3: [],
+      }
+    },
+    mounted() {
+      this.getcount();
+      this.maxCount();
+      this.gettop5();
+      this.troubleFun();
+      this.monthCount();
+      this.userCount();
+      this.timer1 = setInterval(this.getcount, 60000);
+      this.timer2 = setInterval(this.maxCount, 60000);
+      this.timer3 = setInterval(this.gettop5, 60000);
+      this.timer4 = setInterval(this.troubleFun, 86400000);
+      this.timer5 = setInterval(this.monthCount, 86400000);
+      this.timer6 = setInterval(this.userCount, 86400000);
+    },
+    methods: {
+      //请求当天工单数
+      getcount() {
+        let path = 'https://itservice.chintpower.com'
+        let path = 'https://localhost'
+        axios.post(`${path}:8085/api1.0/manage/card/count`, {}).then(res => {
+          // console.log(res);
+          if (res.data.code === 200) {
+            this.totalCount = res.data.data.totalCount;
+            this.treateCount = res.data.data.treateCount;
+            this.untreateCount = res.data.data.untreateCount;
+          }
+        })
+      },
+      //top5工程师手工单
+      gettop5() {
+        const arr = [1, 2, 3, 4];
+        let serviceId = arr[Math.floor((Math.random() * arr.length))];
+        let path = 'https://itservice.chintpower.com'
+        let path = 'https://localhost'
+        axios.post(`${path}:8085/api1.0/manage/user/count`, {serviceId}).then(res => {
+          // console.log(res);
+          if (res.data.code === 200) {
+            this.top5.dataX = res.data.data.userList;
+            this.top5.dataY = res.data.data.countList;
+            this.ininchar1(this.top5);
+          }
+        })
+      },
+      //故障类型占比
+      troubleFun() {
+        let path = 'https://itservice.chintpower.com'
+        let path = 'https://localhost'
+        axios.post(`${path}:8085/api1.0/manage/problem/count`, {}).then(res => {
+          // console.log(res);
+          if (res.data.code === 200) {
+            let list = res.data.data.problemList;
+            let listArr = [];
+            list.map(item => {
+              listArr.push({name: item.problemName, value: item.count})
+            });
+            this.trouble = listArr;
+            this.ininchar2(this.trouble);
+          }
+        })
+      },
+      //各部门中工单数量最多的故障类型
+      monthCount() {
+        let path = 'https://itservice.chintpower.com'
+        let path = 'https://localhost'
+        axios.post(`${path}:8085/api1.0/manage/dept/count`, {}).then(res => {
+          // console.log(res.data)
+          if (res.data.code === 200) {
+            this.satisfaction.dataX = res.data.data.problems;
+            const deptProblemsList = res.data.data.deptProblems;
+            let per = [];
+            let list = [];
+            deptProblemsList.map(item => {
+              per.push(item.deptName);
+              list.push({
+                name: item.deptName,
+                type: 'line',
+                stack: '总量',
+                data: item.countList,
+                label: {
+                  "show": true,
+                  "position": "top",
+                  formatter: function (p) {
+                    return p.value > 0 ? (p.value) : '';
+                  }
+                }
+              })
+            });
+            this.satisfaction.per = per;
+            this.satisfaction.dataY = list;
+            this.ininchar3(this.satisfaction);
+          }
+        })
+      },
+      //各部门评价占比
+      userCount() {
+        let path = 'https://itservice.chintpower.com'
+        let path = 'https://localhost'
+        axios.post(`${path}:8085/api1.0/manage/dept/comment`, {countId: 4}).then(res => {
+          // console.log(res);
+          if (res.data.code === 200) {
+            this.usersat.dataX = res.data.data.userList;
+            this.usersat.dataY1 = res.data.data.countList;
+            this.usersat.dataY2 = res.data.data.unCountList;
+            this.usersat.dataY3 = res.data.data.commentList;
+            this.ininchar4(this.usersat);
+          }
+        })
+      },
+
+      //待处理工单
+      maxCount() {
+        let path = 'https://itservice.chintpower.com'
+        let path = 'https://localhost'
+        axios.post(`${path}:8085/api1.0/manage/unDeal/card`, {}).then(res => {
+          console.log(res);
+          if (res.data.code === 200) {
+            let list = res.data.data.cardList;
+            let tabData = [];
+            if (list === null || list.length === 0) {
+              tabData = [['', '暂无数据', '']]
+            } else {
+              list.map(item => {
+                tabData.push([item.applyName, item.deal, item.problemType, item.waitCount, item.createTime])
+              });
             }
-        },
-        mounted() {
-            this.getcount();
-            this.maxCount();
-            this.gettop5();
-            this.troubleFun();
-            this.monthCount();
-            this.userCount();
-            this.timer1 = setInterval(this.getcount, 60000);
-            this.timer2 = setInterval(this.maxCount, 60000);
-            this.timer3 = setInterval(this.gettop5, 60000);
-            this.timer4 = setInterval(this.troubleFun, 86400000);
-            this.timer5 = setInterval(this.monthCount, 86400000);
-            this.timer6 = setInterval(this.userCount, 86400000);
-        },
-        methods: {
-            //请求当天工单数
-            getcount() {
-                axios.post('https://itservice.chintpower.com:8085/api1.0/manage/card/count', {}).then(res => {
-                    // console.log(res);
-                    if (res.data.code === 200) {
-                        this.totalCount = res.data.data.totalCount;
-                        this.treateCount = res.data.data.treateCount;
-                        this.untreateCount = res.data.data.untreateCount;
-                    }
-                })
-            },
-            //top5工程师手工单
-            gettop5() {
-				const arr = [1,2,3,4];
-				let serviceId = arr[Math.floor((Math.random()*arr.length))];
-                axios.post('https://itservice.chint-eletech.com:8085/api1.0/manage/user/count', {serviceId}).then(res => {
-                    // console.log(res);
-                    if (res.data.code === 200) {
-                        this.top5.dataX = res.data.data.userList;
-                        this.top5.dataY = res.data.data.countList;
-                        this.ininchar1(this.top5);
-                    }
-                })
-            },
-            //故障类型占比
-            troubleFun() {
-                axios.post('https://itservice.chint-eletech.com:8085/api1.0/manage/problem/count', {}).then(res => {
-                    // console.log(res);
-                    if (res.data.code === 200) {
-                        let list = res.data.data.problemList;
-                        let listArr = [];
-                        list.map(item => {
-                            listArr.push({name: item.problemName, value: item.count})
-                        });
-                        this.trouble=listArr;
-                        this.ininchar2(this.trouble);
-                    }
-                })
-            },
-            //各部门中工单数量最多的故障类型
-            monthCount() {
-                axios.post('https://itservice.chint-eletech.com:8085/api1.0/manage/dept/count', {}).then(res => {
-                    // console.log(res.data)
-                    if (res.data.code === 200) {
-                        this.satisfaction.dataX = res.data.data.problems;
-                        const deptProblemsList = res.data.data.deptProblems;
-                        let per=[];
-                        let list = [];
-                        deptProblemsList.map(item=>{
-                            per.push(item.deptName);
-                            list.push({
-                                name: item.deptName,
-                                type: 'line',
-                                stack: '总量',
-                                data: item.countList,
-                                label: {
-                                    "show": true,
-                                    "position": "top",
-                                    formatter: function(p) {
-                                        return p.value > 0 ? (p.value) : '';
-                                    }
-                                }
-                            })
-                        });
-                        this.satisfaction.per = per;
-                        this.satisfaction.dataY = list;
-                        this.ininchar3(this.satisfaction);
-                    }
-                })
-            },
-            //各部门评价占比
-            userCount() {
-                axios.post('https://itservice.chint-eletech.com:8085/api1.0/manage/dept/comment', {countId: 4}).then(res => {
-                    // console.log(res);
-                    if (res.data.code === 200) {
-                        this.usersat.dataX = res.data.data.userList;
-                        this.usersat.dataY1 = res.data.data.countList;
-                        this.usersat.dataY2 = res.data.data.unCountList;
-                        this.usersat.dataY3 = res.data.data.commentList;
-                        this.ininchar4(this.usersat);
-                    }
-                })
-            },
 
-            //待处理工单
-            maxCount() {
-                axios.post('https://itservice.chint-eletech.com:8085/api1.0/manage/unDeal/card', {}).then(res => {
-                    console.log(res);
-                    if (res.data.code === 200) {
-                        let list = res.data.data.cardList;
-                        let tabData = [];
-                        if(list.length===0){
-                            tabData = [['','暂无数据','']]
-                        }else {
-                            list.map(item => {
-                                tabData.push([item.applyName,item.deal, item.problemType, item.waitCount, item.createTime])
-                            });
-                        }
+            this.config = {
+              header: ['申请人', '处理人', '故障类型', '排队人数', '创建时间'],
+              data: tabData,
+              headerHeight: 50,
+              headerBGC: 'transparent',
+              oddRowBGC: '#052951',
+              evenRowBGC: '#091734'
+            }
+          }
+        })
+      },
+      // top5工程师工作量统计图
+      ininchar1(value) {
+        let myChart = echarts.init(document.getElementById('main1'));
+        // 指定图表的配置项和数据
+        let option = {
+          title: {
+            text: 'TOP5工程师工作量-本月',
+            textStyle: {
+              color: 'white',
+              fontSize: 18,
+            },
+            left: 'center',
+            top: 10,
+          },
+          tooltip: {},
+          grid: {
+            left: '4%',
+            right: '5%',
+            bottom: '4%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'value',
+            data: value.dataY,
+            axisLine: {
+              lineStyle: {
+                color: '#c4d5e6'
+              }
+            },
+            nameTextStyle: {
+              color: 'white',
+            },
+            splitLine: {
+              show: false,
+            }
+          },
+          yAxis: {
+            type: 'category',
+            data: value.dataX,
+            axisLine: {
+              lineStyle: {
+                color: '#c4d5e6'
+              }
+            },
+            nameTextStyle: {
+              color: 'white',
+            },
+          },
+          series: [{
+            name: '工作量',
+            type: 'bar',
+            barMaxWidth: 50,
+            itemStyle: {
+              color: '#40a7db'
+            },
+            itemStyle: {
+              normal: {
+                "color": "rgb(6,105,177)",
+                "label": {
+                  "show": true,
+                  "textStyle": {
+                    "color": "#fff"
+                  },
+                  "position": "insideTop",
+                  formatter: function (p) {
+                    return p.value > 0 ? (p.value) : '';
+                  }
+                }
+              }
+            },
+            data: value.dataY,
+          }]
+        };
+        myChart.setOption(option);
+      },
+      //故障类型统计图
+      ininchar2(value) {
+        // 基于准备好的dom，初始化echarts实例
+        let myChart = echarts.init(document.getElementById('main2'), 'light');
+        let option = {
+          title: {
+            text: '故障类型占比-本月',
+            textStyle: {
+              color: 'white',
+              fontSize: 18,
+            },
+            left: 'center',
+            top: 10,
+          },
+          tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          legend: {
+            show: false,
+          },
+          series: [
+            {
+              name: '故障类型占比',
+              type: 'pie',
+              radius: '65%',
+              center: ['50%', '55%'],
+              selectedMode: 'single',
+              data: value,
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
+            }
+          ]
+        };
+        // 使用刚指定的配置项和数据显示图表。
 
-                        this.config = {
-                            header: ['申请人','处理人', '故障类型', '排队人数','创建时间'],
-                            data: tabData,
-                            headerHeight: 50,
-                            headerBGC: 'transparent',
-                            oddRowBGC: '#052951',
-                            evenRowBGC: '#091734'
-                        }
+        myChart.setOption(option);
+      },
+      // 各部门中工单数量最多的故障类型统计表
+      ininchar3(value) {
+        let myChart = echarts.init(document.getElementById('main3'), 'light');
+        // 指定图表的配置项和数据
+        let option = {
+          title: {
+            text: '各部门中工单数量最多的故障类型-本月',
+            textStyle: {
+              color: 'white',
+              fontSize: 18,
+            },
+            left: 'center',
+            top: 10,
+          },
+          legend: {
+            x: '2%',
+            top: 40,
+            padding: [5, 10],
+            textStyle: {
+              color: '#d6dee5',
+            },
+            data: value.pre,
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            top: '30%',
+            containLabel: true
+          },
+          toolbox: {
+            feature: {
+              saveAsImage: {}
+            }
+          },
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            axisLine: {
+              lineStyle: {
+                color: '#c4d5e6'
+              }
+            },
+            axisLabel: {
+              // 坐标轴刻度标签换行处理
+              formatter: function (params) {
+                var newParamsName = ""; // 最终拼接成的字符串
+                var paramsNameNumber = params.length; // 实际标签的个数
+                var provideNumber = 4; // 每行能显示的字的个数
+                var rowNumber = Math.ceil(paramsNameNumber / provideNumber); // 换行的话，需要显示几行，向上取整
+                /**
+                 * 判断标签的个数是否大于规定的个数， 如果大于，则进行换行处理 如果不大于，即等于或小于，就返回原标签
+                 */
+                // 条件等同于rowNumber>1
+                if (paramsNameNumber > provideNumber) {
+                  /** 循环每一行,p表示行 */
+                  for (var p = 0; p < rowNumber; p++) {
+                    var tempStr = ""; // 表示每一次截取的字符串
+                    var start = p * provideNumber; // 开始截取的位置
+                    var end = start + provideNumber; // 结束截取的位置
+                    // 此处特殊处理最后一行的索引值
+                    if (p == rowNumber - 1) {
+                      // 最后一次不换行
+                      tempStr = params.substring(start, paramsNameNumber);
+                    } else {
+                      // 每一次拼接字符串并换行
+                      tempStr = params.substring(start, end) + "\n";
                     }
-                })
+                    newParamsName += tempStr; // 最终拼成的字符串
+                  }
+                } else {
+                  // 将旧标签的值赋给新标签
+                  newParamsName = params;
+                }
+                //将最终的字符串返回
+                return newParamsName;
+              },
             },
-            // top5工程师工作量统计图
-            ininchar1(value) {
-                let myChart = echarts.init(document.getElementById('main1'));
-                // 指定图表的配置项和数据
-                let option = {
-                    title: {
-                        text: 'TOP5工程师工作量-本月',
-                        textStyle: {
-                            color: 'white',
-                            fontSize: 18,
-                        },
-                        left: 'center',
-                        top: 10,
-                    },
-                    tooltip: {},
-                    grid: {
-                        left: '4%',
-                        right: '5%',
-                        bottom: '4%',
-                        containLabel: true
-                    },
-                    xAxis: {
-                        type: 'value',
-                        data: value.dataY,
-                        axisLine: {
-                            lineStyle: {
-                                color: '#c4d5e6'
-                            }
-                        },
-                        nameTextStyle: {
-                            color: 'white',
-                        },
-                        splitLine: {
-                            show: false,
-                        }
-                    },
-                    yAxis: {
-                        type: 'category',
-                        data: value.dataX,
-                        axisLine: {
-                            lineStyle: {
-                                color: '#c4d5e6'
-                            }
-                        },
-                        nameTextStyle: {
-                            color: 'white',
-                        },
-                    },
-                    series: [{
-                        name: '工作量',
-                        type: 'bar',
-                        barMaxWidth: 50,
-                        itemStyle: {
-                            color: '#40a7db'
-                        },
-                        itemStyle: {
-                            normal: {
-                                "color": "rgb(6,105,177)",
-                                "label": {
-                                    "show": true,
-                                    "textStyle": {
-                                        "color": "#fff"
-                                    },
-                                    "position": "insideTop",
-                                    formatter: function (p) {
-                                        return p.value > 0 ? (p.value) : '';
-                                    }
-                                }
-                            }
-                        },
-                        data: value.dataY,
-                    }]
-                };
-                myChart.setOption(option);
+            data: value.dataX
+          },
+          yAxis: {
+            type: 'value',
+            axisLine: {
+              lineStyle: {
+                color: '#edfaff'
+              }
             },
-            //故障类型统计图
-            ininchar2(value) {
-                // 基于准备好的dom，初始化echarts实例
-                let myChart = echarts.init(document.getElementById('main2'),'light');
-                let option = {
-                    title: {
-                        text: '故障类型占比-本月',
-                        textStyle: {
-                            color: 'white',
-                            fontSize: 18,
-                        },
-                        left: 'center',
-                        top: 10,
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: '{a} <br/>{b} : {c} ({d}%)'
-                    },
-                    legend: {
-                        show: false,
-                    },
-                    series: [
-                        {
-                            name: '故障类型占比',
-                            type: 'pie',
-                            radius: '65%',
-                            center: ['50%', '55%'],
-                            selectedMode: 'single',
-                            data: value,
-                            emphasis: {
-                                itemStyle: {
-                                    shadowBlur: 10,
-                                    shadowOffsetX: 0,
-                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                }
-                            }
-                        }
-                    ]
-                };
-                // 使用刚指定的配置项和数据显示图表。
-
-                myChart.setOption(option);
+            splitLine: {
+              show: false,
             },
-            // 各部门中工单数量最多的故障类型统计表
-            ininchar3(value) {
-                let myChart = echarts.init(document.getElementById('main3'),'light');
-                // 指定图表的配置项和数据
-                let option = {
-                    title: {
-                        text: '各部门中工单数量最多的故障类型-本月',
-                        textStyle: {
-                            color: 'white',
-                            fontSize: 18,
-                        },
-                        left: 'center',
-                        top: 10,
-                    },
-                    legend: {
-                        x: '2%',
-                        top: 40,
-                        padding: [5, 10],
-                        textStyle: {
-                            color: '#d6dee5',
-                        },
-                        data: value.pre,
-                    },
-                    grid: {
-                        left: '3%',
-                        right: '4%',
-                        bottom: '3%',
-                        top:'30%',
-                        containLabel: true
-                    },
-                    toolbox: {
-                        feature: {
-                            saveAsImage: {}
-                        }
-                    },
-                    xAxis: {
-                        type: 'category',
-                        boundaryGap: false,
-                        axisLine: {
-                            lineStyle: {
-                                color: '#c4d5e6'
-                            }
-                        },
-                        axisLabel: {
-                            // 坐标轴刻度标签换行处理
-                            formatter: function (params) {
-                                var newParamsName = ""; // 最终拼接成的字符串
-                                var paramsNameNumber = params.length; // 实际标签的个数
-                                var provideNumber = 4; // 每行能显示的字的个数
-                                var rowNumber = Math.ceil(paramsNameNumber / provideNumber); // 换行的话，需要显示几行，向上取整
-                                /**
-                                 * 判断标签的个数是否大于规定的个数， 如果大于，则进行换行处理 如果不大于，即等于或小于，就返回原标签
-                                 */
-                                // 条件等同于rowNumber>1
-                                if (paramsNameNumber > provideNumber) {
-                                    /** 循环每一行,p表示行 */
-                                    for (var p = 0; p < rowNumber; p++) {
-                                        var tempStr = ""; // 表示每一次截取的字符串
-                                        var start = p * provideNumber; // 开始截取的位置
-                                        var end = start + provideNumber; // 结束截取的位置
-                                        // 此处特殊处理最后一行的索引值
-                                        if (p == rowNumber - 1) {
-                                            // 最后一次不换行
-                                            tempStr = params.substring(start, paramsNameNumber);
-                                        } else {
-                                            // 每一次拼接字符串并换行
-                                            tempStr = params.substring(start, end) + "\n";
-                                        }
-                                        newParamsName += tempStr; // 最终拼成的字符串
-                                    }
-                                } else {
-                                    // 将旧标签的值赋给新标签
-                                    newParamsName = params;
-                                }
-                                //将最终的字符串返回
-                                return newParamsName;
-                            },
-                        },
-                        data: value.dataX
-                    },
-                    yAxis: {
-                        type: 'value',
-                        axisLine: {
-                            lineStyle: {
-                                color: '#edfaff'
-                            }
-                        },
-                        splitLine: {
-                            show: false,
-                        },
-                        nameTextStyle: {
-                            color: 'white',
-                        },
-                    },
-                    series: value.dataY
-                };
-                myChart.setOption(option);
+            nameTextStyle: {
+              color: 'white',
             },
-            // 用户满意度，各部门是否评价占比统计表
-            ininchar4(value) {
-                let myChart = echarts.init(document.getElementById('main4'));
-                // 指定图表的配置项和数据
-                let option = {
-                    title: {
-                        text: '用户满意度，各部门是否评价占比-本季度',
-                        textStyle: {
-                            color: 'white',
-                            fontSize: 18,
-                        },
-                        left: 'center',
-                        top: 10,
-                    },
-                    grid: {
-                        left: '3%',
-                        right: '4%',
-                        bottom: '3%',
-                        top:'25%',
-                        containLabel: true
-                    },
-                    "legend": {
-                        x: '2%',
-                        top: '11%',
-                        padding: [5, 10],
-                        textStyle: {
-                            color: '#d6dee5',
-                        },
-                        "data": ['已评价', '未评价', '满意度']
-                    },
-                    tooltip: {},
-                    xAxis: {
-                        type: 'category',
-                        data: value.dataX,
-                        axisLine: {
-                            lineStyle: {
-                                color: '#c4d5e6'
-                            }
-                        },
-                        nameTextStyle: {
-                            color: 'white',
-                        },
-                        splitLine: {
-                            show: false,
-                        },
-                        axisLabel: {
-                            // 坐标轴刻度标签换行处理
-                            formatter: function (params) {
-                                var newParamsName = ""; // 最终拼接成的字符串
-                                var paramsNameNumber = params.length; // 实际标签的个数
-                                var provideNumber = 4; // 每行能显示的字的个数
-                                var rowNumber = Math.ceil(paramsNameNumber / provideNumber); // 换行的话，需要显示几行，向上取整
-                                /**
-                                 * 判断标签的个数是否大于规定的个数， 如果大于，则进行换行处理 如果不大于，即等于或小于，就返回原标签
-                                 */
-                                // 条件等同于rowNumber>1
-                                if (paramsNameNumber > provideNumber) {
-                                    /** 循环每一行,p表示行 */
-                                    for (var p = 0; p < rowNumber; p++) {
-                                        var tempStr = ""; // 表示每一次截取的字符串
-                                        var start = p * provideNumber; // 开始截取的位置
-                                        var end = start + provideNumber; // 结束截取的位置
-                                        // 此处特殊处理最后一行的索引值
-                                        if (p == rowNumber - 1) {
-                                            // 最后一次不换行
-                                            tempStr = params.substring(start, paramsNameNumber);
-                                        } else {
-                                            // 每一次拼接字符串并换行
-                                            tempStr = params.substring(start, end) + "\n";
-                                        }
-                                        newParamsName += tempStr; // 最终拼成的字符串
-                                    }
-                                } else {
-                                    // 将旧标签的值赋给新标签
-                                    newParamsName = params;
-                                }
-                                //将最终的字符串返回
-                                return newParamsName;
-                            },
-                        }
-                    },
-                    yAxis: {
-                        type: 'value',
-                        data: value.dataY,
-                        axisLine: {
-                            lineStyle: {
-                                color: '#c4d5e6'
-                            }
-                        },
-                        // axisLabel: {
-                        //     show: true,
-                        //     interval: 'auto',
-                        //     formatter: '{value} %'
-                        // },
-                        nameTextStyle: {
-                            color: 'white',
-                        },
-                        splitLine: {
-                            show: false,
-                        }
-                    },
-                    series: [
-                        {
-                            name: '已评价',
-                            stack: "总量",
-                            type: 'bar',
-                            barMaxWidth: 50,
-                            itemStyle: {
-                                "normal": {
-                                    "color": "rgba(255,144,128,1)",
-                                    "label": {
-                                        "show": true,
-                                        "textStyle": {
-                                            "color": "#fff"
-                                        },
-                                        "position": "insideTop",
-                                        formatter: function (p) {
-                                            return p.value > 0 ? (p.value) : '';
-                                        }
-                                    }
-                                }
-                            },
-                            label: {
-                                show: true,
-                                position: 'top'
-                            },
-                            data: value.dataY1,
-                        },
-                        {
-                            name: '未评价',
-                            type: 'bar',
-                            stack: "总量",
-                            barMaxWidth: 50,
-                            itemStyle: {
-                                "normal": {
-                                    "color": "rgba(0,191,183,1)",
-                                    "barBorderRadius": 0,
-                                    "label": {
-                                        "show": true,
-                                        "position": "top",
-                                        formatter: function (p) {
-                                            return p.value > 0 ? (p.value) : '';
-                                        }
-                                    }
-                                },
-                            },
-                            label: {
-                                show: true,
-                                position: 'top'
-                            },
-                            data: value.dataY2,
-                        },
-                        {
-                            name: '满意度',
-                            type: 'line',
-                            symbolSize: 15,
-                            symbol: 'circle',
-                            itemStyle: {
-                                "normal": {
-                                    "color": "rgba(252,230,48,1)",
-                                    "barBorderRadius": 0,
-                                    "label": {
-                                        "show": true,
-                                        "position": "top",
-                                        formatter: function (p) {
-                                            return p.value > 0 ? (p.value) : '';
-                                        }
-                                    }
-                                }
-                            },
-                            label: {
-                                show: true,
-                                position: 'top'
-                            },
-                            data: value.dataY3,
-                        },
-                    ]
-                };
-                myChart.setOption(option);
+          },
+          series: value.dataY
+        };
+        myChart.setOption(option);
+      },
+      // 用户满意度，各部门是否评价占比统计表
+      ininchar4(value) {
+        let myChart = echarts.init(document.getElementById('main4'));
+        // 指定图表的配置项和数据
+        let option = {
+          title: {
+            text: '用户满意度，各部门是否评价占比-本季度',
+            textStyle: {
+              color: 'white',
+              fontSize: 18,
             },
-        },
-        beforeDestroy() {
-            clearInterval(this.timer1);
-            clearInterval(this.timer2);
-            clearInterval(this.timer3);
-            clearInterval(this.timer4);
-            clearInterval(this.timer5);
-            clearInterval(this.timer6);
-        }
-    })
+            left: 'center',
+            top: 10,
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            top: '25%',
+            containLabel: true
+          },
+          "legend": {
+            x: '2%',
+            top: '11%',
+            padding: [5, 10],
+            textStyle: {
+              color: '#d6dee5',
+            },
+            "data": ['已评价', '未评价', '满意度']
+          },
+          tooltip: {},
+          xAxis: {
+            type: 'category',
+            data: value.dataX,
+            axisLine: {
+              lineStyle: {
+                color: '#c4d5e6'
+              }
+            },
+            nameTextStyle: {
+              color: 'white',
+            },
+            splitLine: {
+              show: false,
+            },
+            axisLabel: {
+              // 坐标轴刻度标签换行处理
+              formatter: function (params) {
+                var newParamsName = ""; // 最终拼接成的字符串
+                var paramsNameNumber = params.length; // 实际标签的个数
+                var provideNumber = 4; // 每行能显示的字的个数
+                var rowNumber = Math.ceil(paramsNameNumber / provideNumber); // 换行的话，需要显示几行，向上取整
+                /**
+                 * 判断标签的个数是否大于规定的个数， 如果大于，则进行换行处理 如果不大于，即等于或小于，就返回原标签
+                 */
+                // 条件等同于rowNumber>1
+                if (paramsNameNumber > provideNumber) {
+                  /** 循环每一行,p表示行 */
+                  for (var p = 0; p < rowNumber; p++) {
+                    var tempStr = ""; // 表示每一次截取的字符串
+                    var start = p * provideNumber; // 开始截取的位置
+                    var end = start + provideNumber; // 结束截取的位置
+                    // 此处特殊处理最后一行的索引值
+                    if (p == rowNumber - 1) {
+                      // 最后一次不换行
+                      tempStr = params.substring(start, paramsNameNumber);
+                    } else {
+                      // 每一次拼接字符串并换行
+                      tempStr = params.substring(start, end) + "\n";
+                    }
+                    newParamsName += tempStr; // 最终拼成的字符串
+                  }
+                } else {
+                  // 将旧标签的值赋给新标签
+                  newParamsName = params;
+                }
+                //将最终的字符串返回
+                return newParamsName;
+              },
+            }
+          },
+          yAxis: {
+            type: 'value',
+            data: value.dataY,
+            axisLine: {
+              lineStyle: {
+                color: '#c4d5e6'
+              }
+            },
+            // axisLabel: {
+            //     show: true,
+            //     interval: 'auto',
+            //     formatter: '{value} %'
+            // },
+            nameTextStyle: {
+              color: 'white',
+            },
+            splitLine: {
+              show: false,
+            }
+          },
+          series: [
+            {
+              name: '已评价',
+              stack: "总量",
+              type: 'bar',
+              barMaxWidth: 50,
+              itemStyle: {
+                "normal": {
+                  "color": "rgba(255,144,128,1)",
+                  "label": {
+                    "show": true,
+                    "textStyle": {
+                      "color": "#fff"
+                    },
+                    "position": "insideTop",
+                    formatter: function (p) {
+                      return p.value > 0 ? (p.value) : '';
+                    }
+                  }
+                }
+              },
+              label: {
+                show: true,
+                position: 'top'
+              },
+              data: value.dataY1,
+            },
+            {
+              name: '未评价',
+              type: 'bar',
+              stack: "总量",
+              barMaxWidth: 50,
+              itemStyle: {
+                "normal": {
+                  "color": "rgba(0,191,183,1)",
+                  "barBorderRadius": 0,
+                  "label": {
+                    "show": true,
+                    "position": "top",
+                    formatter: function (p) {
+                      return p.value > 0 ? (p.value) : '';
+                    }
+                  }
+                },
+              },
+              label: {
+                show: true,
+                position: 'top'
+              },
+              data: value.dataY2,
+            },
+            {
+              name: '满意度',
+              type: 'line',
+              symbolSize: 15,
+              symbol: 'circle',
+              itemStyle: {
+                "normal": {
+                  "color": "rgba(252,230,48,1)",
+                  "barBorderRadius": 0,
+                  "label": {
+                    "show": true,
+                    "position": "top",
+                    formatter: function (p) {
+                      return p.value > 0 ? (p.value) : '';
+                    }
+                  }
+                }
+              },
+              label: {
+                show: true,
+                position: 'top'
+              },
+              data: value.dataY3,
+            },
+          ]
+        };
+        myChart.setOption(option);
+      },
+    },
+    beforeDestroy() {
+      clearInterval(this.timer1);
+      clearInterval(this.timer2);
+      clearInterval(this.timer3);
+      clearInterval(this.timer4);
+      clearInterval(this.timer5);
+      clearInterval(this.timer6);
+    }
+  })
 
 </script>
 </html>

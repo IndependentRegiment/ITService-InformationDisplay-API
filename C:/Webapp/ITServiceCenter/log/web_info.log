@@ -1,12 +1,18 @@
-2021-01-22 18:26:55.969 [main] INFO  com.zt.itservice.ItServiceIndexApplicationTests - Starting ItServiceIndexApplicationTests using Java 1.8.0_191 on NarcisodeMacBook-Air.local with PID 6268 (started by narcisohuang in /Users/narcisohuang/workspace/chintpower/ITServicep-Index)
-2021-01-22 18:26:55.971 [main] INFO  com.zt.itservice.ItServiceIndexApplicationTests - The following profiles are active: prod
-2021-01-22 18:26:58.887 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'applicationTaskExecutor'
-2021-01-22 18:26:59.194 [main] INFO  o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
-2021-01-22 18:26:59.595 [main] INFO  org.quartz.impl.StdSchedulerFactory - Using default implementation for ThreadExecutor
-2021-01-22 18:26:59.642 [main] INFO  org.quartz.core.SchedulerSignalerImpl - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
-2021-01-22 18:26:59.643 [main] INFO  org.quartz.core.QuartzScheduler - Quartz Scheduler v.2.3.2 created.
-2021-01-22 18:26:59.645 [main] INFO  org.quartz.simpl.RAMJobStore - RAMJobStore initialized.
-2021-01-22 18:26:59.646 [main] INFO  org.quartz.core.QuartzScheduler - Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+2021-03-25 14:54:53.238 [main] INFO  com.zt.itservice.ItServiceIndexApplication - Starting ItServiceIndexApplication using Java 1.8.0_191 on NarcisodeMacBook-Air.local with PID 34605 (/Users/narcisohuang/workspace/chintpower/ITServicep-Index/target/classes started by narcisohuang in /Users/narcisohuang/workspace/chintpower/ITServicep-Index)
+2021-03-25 14:54:53.244 [main] INFO  com.zt.itservice.ItServiceIndexApplication - The following profiles are active: prod
+2021-03-25 14:54:54.656 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8084 (https)
+2021-03-25 14:54:54.670 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["https-jsse-nio-8084"]
+2021-03-25 14:54:54.671 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2021-03-25 14:54:54.672 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.41]
+2021-03-25 14:54:54.750 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2021-03-25 14:54:54.750 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1429 ms
+2021-03-25 14:54:55.035 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'applicationTaskExecutor'
+2021-03-25 14:54:55.136 [main] INFO  o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2021-03-25 14:54:55.338 [main] INFO  org.quartz.impl.StdSchedulerFactory - Using default implementation for ThreadExecutor
+2021-03-25 14:54:55.379 [main] INFO  org.quartz.core.SchedulerSignalerImpl - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2021-03-25 14:54:55.379 [main] INFO  org.quartz.core.QuartzScheduler - Quartz Scheduler v.2.3.2 created.
+2021-03-25 14:54:55.381 [main] INFO  org.quartz.simpl.RAMJobStore - RAMJobStore initialized.
+2021-03-25 14:54:55.383 [main] INFO  org.quartz.core.QuartzScheduler - Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
   Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
   NOT STARTED.
   Currently in standby mode.
@@ -14,15 +20,20 @@
   Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
   Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
 
-2021-01-22 18:26:59.647 [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
-2021-01-22 18:26:59.647 [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler version: 2.3.2
-2021-01-22 18:26:59.647 [main] INFO  org.quartz.core.QuartzScheduler - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@6b2e0f78
-2021-01-22 18:26:59.716 [main] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Starting Quartz Scheduler now
-2021-01-22 18:26:59.718 [main] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED started.
-2021-01-22 18:26:59.740 [main] INFO  com.zt.itservice.ItServiceIndexApplicationTests - Started ItServiceIndexApplicationTests in 4.864 seconds (JVM running for 7.022)
-2021-01-22 18:27:00.613 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
-2021-01-22 18:27:00.615 [SpringContextShutdownHook] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Shutting down Quartz Scheduler
-2021-01-22 18:27:00.615 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
-2021-01-22 18:27:00.616 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
-2021-01-22 18:27:00.625 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
-2021-01-22 18:27:00.638 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'applicationTaskExecutor'
+2021-03-25 14:54:55.383 [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+2021-03-25 14:54:55.383 [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler version: 2.3.2
+2021-03-25 14:54:55.384 [main] INFO  org.quartz.core.QuartzScheduler - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@522ba524
+2021-03-25 14:54:55.412 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["https-jsse-nio-8084"]
+2021-03-25 14:54:56.440 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8084 (https) with context path ''
+2021-03-25 14:54:56.443 [main] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Starting Quartz Scheduler now
+2021-03-25 14:54:56.444 [main] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED started.
+2021-03-25 14:54:56.458 [main] INFO  com.zt.itservice.ItServiceIndexApplication - Started ItServiceIndexApplication in 4.596 seconds (JVM running for 6.21)
+2021-03-25 14:56:49.010 [https-jsse-nio-8084-exec-13] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2021-03-25 14:56:49.011 [https-jsse-nio-8084-exec-13] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2021-03-25 14:56:49.013 [https-jsse-nio-8084-exec-13] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2021-03-25 16:53:57.642 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2021-03-25 16:53:57.765 [SpringContextShutdownHook] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Shutting down Quartz Scheduler
+2021-03-25 16:53:57.765 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+2021-03-25 16:53:57.765 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2021-03-25 16:53:57.766 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+2021-03-25 16:53:57.769 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'applicationTaskExecutor'
